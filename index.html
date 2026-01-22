@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Music Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Select up to 3 MP3 files</h2>
+
+<input type="file" id="fileInput" accept="audio/mp3" multiple>
+<p id="status"></p>
+
+<button id="playBtn">Play All</button>
+<button id="stopBtn">Stop All</button>
+
+<script>
+    const fileInput = document.getElementById("fileInput");
+    const status = document.getElementById("status");
+    const playBtn = document.getElementById("playBtn");
+    const stopBtn = document.getElementById("stopBtn");
+
+    let audioObjects = [];
+
+    fileInput.addEventListener("change", () => {
+        const files = Array.from(fileInput.files);
+
+        if (files.length > 3) {
+            status.textContent = "Please select no more than 3 MP3 files.";
+            fileInput.value = "";
+            audioObjects = [];
+            return;
+        }
+
+        audioObjects = files.map(file => {
+            const url = URL.createObjectURL(file);
+            return new Audio(url);
+        });
+
+        status.textContent = `${files.length} file(s) ready to play.`;
+    });
+
+    playBtn.addEventListener("click", () => {
+        if (audioObjects.length === 0) {
+            status.textContent = "No files selected.";
+            return;
+        }
+
+        audioObjects.forEach(audio => {
+            audio.currentTime = 0;
+            audio.play();
+        });
+
+        status.textContent = "Playing all selected files.";
+    });
+
+    stopBtn.addEventListener("click", () => {
+        audioObjects.forEach(audio => {
+            audio.pause();
+            audio.currentTime = 0;
+        });
+
+        status.textContent = "Stopped.";
+    });
+</script>
+
+</body>
+</html>
