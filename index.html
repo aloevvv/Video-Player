@@ -8,6 +8,13 @@
             font-family: Arial, sans-serif;
             margin: 40px;
         }
+        .track {
+            margin-top: 15px;
+        }
+        .track label {
+            display: block;
+            margin-bottom: 5px;
+        }
         button {
             margin-top: 20px;
             padding: 10px 20px;
@@ -22,12 +29,15 @@
 <input type="file" id="fileInput" accept="audio/mp3" multiple>
 <p id="status"></p>
 
+<div id="sliders"></div>
+
 <button id="playBtn">Play All</button>
 <button id="stopBtn">Stop All</button>
 
 <script>
     const fileInput = document.getElementById("fileInput");
     const status = document.getElementById("status");
+    const slidersDiv = document.getElementById("sliders");
     const playBtn = document.getElementById("playBtn");
     const stopBtn = document.getElementById("stopBtn");
 
@@ -40,15 +50,36 @@
             status.textContent = "Please select no more than 3 MP3 files.";
             fileInput.value = "";
             audioObjects = [];
+            slidersDiv.innerHTML = "";
             return;
         }
 
+        // Create audio objects
         audioObjects = files.map(file => {
             const url = URL.createObjectURL(file);
             return new Audio(url);
         });
 
         status.textContent = `${files.length} file(s) ready to play.`;
+
+        // Create volume sliders
+        slidersDiv.innerHTML = "";
+        audioObjects.forEach((audio, index) => {
+            const trackDiv = document.createElement("div");
+            trackDiv.className = "track";
+
+            trackDiv.innerHTML = `
+                <label>Track ${index + 1} Volume</label>
+                <input type="range" min="0" max="1" step="0.01" value="1" id="vol${index}">
+            `;
+
+            slidersDiv.appendChild(trackDiv);
+
+            // Attach volume control
+            document.getElementById(`vol${index}`).addEventListener("input", (e) => {
+                audio.volume = e.target.value;
+            });
+        });
     });
 
     playBtn.addEventListener("click", () => {
